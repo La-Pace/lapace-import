@@ -26,7 +26,7 @@ func TestCoreImportsOnlyAllowedPackages(t *testing.T) {
 		"lapace-control",
 		"lapace-dev-tools",
 		"lapace-voice",
-		"github.com/user/lapace",
+		"github.com/" + "user/lapace",
 	}
 
 	entries, err := os.ReadDir(".")
