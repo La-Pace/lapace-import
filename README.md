@@ -44,7 +44,7 @@ go test ./...
 
 ```bash
 # From the repo root:
-go run ./cmd/import-lmu --input=../sessions_data/sampledata/lmu_duckdb/practice_spa.duckdb --sessions-dir=../sessions_data/sessions
+go run ./cmd/import-lmu --input=../sessions_data/sampledata/lmu_duckdb/practice_spa.duckdb --sessions-dir=../sessions
 ```
 
 See [`docs/guides/lmu-import-guide.md`](docs/guides/lmu-import-guide.md) for the full guide.
