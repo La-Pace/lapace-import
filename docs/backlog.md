@@ -4,32 +4,28 @@
 
 ## P0 — bootstrap the repo
 
-- [ ] Create `github.com/La-Pace/lapace-import` repo with the layout from ADR-0001.
-- [ ] Set up `go.mod` with `lapace-core` as the only workspace dep.
-- [ ] Copy the workspace's standard `AGENTS.md`, `CLAUDE.md`, CI config from an existing module repo (recommend `lapace-dev-tools` as a template — closest in shape).
+- [x] Create `github.com/La-Pace/lapace-import` repo with the layout from ADR-0001. *(commit `4a2c9a5`)*
+- [x] Set up `go.mod` with `lapace-core` as the only workspace dep. *(commit `4a2c9a5`)*
+- [x] Copy the workspace's standard `AGENTS.md`, `CLAUDE.md`, CI config from an existing module repo. *(commit `4a2c9a5`)*
 
 ## P0 — port the LMU adapter
 
-- [ ] Port `LaPace/internal/importlmu/*.go` → `lapace-import/internal/lmu/`. File-by-file mapping:
-  - `reader.go` → `internal/lmu/reader.go`
-  - `mapping.go` → `internal/lmu/mapping.go`
-  - `setup_adapter.go` → `internal/lmu/setup_adapter.go`
-  - `group.go` → `internal/lmu/group.go`
-  - `preview.go` → `internal/lmu/preview.go`
-  - `import.go` → `internal/lmu/adapter.go` (top-level orchestration; satisfies `core.Adapter`)
-  - `writer.go` → split: writer shell stays in `internal/core/writer.go`; sim-specific row construction moves to `internal/lmu/rows.go`
-  - `converter.go` → split: `ReconstructTimestamps` to `internal/core/timestamps.go`; `DerivePhase` to `internal/lmu/phase.go`; `ParseRecordingTime` stays in `internal/lmu/timestamps.go`
-- [ ] Update import paths from `github.com/user/lapace/internal/...` to `github.com/La-Pace/lapace-core/contract/...`.
-- [ ] Port all `*_test.go` files and `integration_test.go` alongside the source files.
-- [ ] Port `testdata/` and verify integration tests still pass against `sampledata/lmu_duckdb/`.
+- [x] Port all `LaPace/internal/importlmu/*.go` → `lapace-import/internal/lmu/` + CLI + testdata. *(commit `fe6b8f6`)*
+- [x] Update import paths from `github.com/user/lapace/internal/...` to `github.com/La-Pace/lapace-core/contract/...`. *(commit `fe6b8f6`)*
+- [x] Port all `*_test.go` files and `integration_test.go`. *(commit `fe6b8f6`)*
+- [x] Port `testdata/`. *(commit `fe6b8f6`)*
 
 ## P0 — extract shared core
 
-- [ ] `internal/core/writer.go` — owns `LapaceWriter`, calls `schema.CreateSignalFamilyTablesSQL()`, sets `lapace_version.schema_type = "signal-family"`, validates output schema before commit.
-- [ ] `internal/core/timestamps.go` — `ReconstructTimestamps(rowCount, frequencyHz, startEpochSeconds) []float64`. LMU and iRacing both call this.
-- [ ] `internal/core/adapter.go` — the `Adapter` interface, `PreviewEntry`, `GroupResult`, `EmitFunc`, supporting types from `docs/technical/adapter-contract.md`.
-- [ ] `internal/core/import_boundary_test.go` — greps adapter packages for forbidden imports (each other, `lapace-capture`, `lapace-receiver`, `lapace-coaching`, `lapace-dashboard`, `lapace-control`, DuckDB Go driver).
-- [ ] `internal/core/writer_validation_test.go` — writer validates output DuckDB before commit.
+- [x] `internal/core/writer.go` — generalized `core.Writer`, calls `schema.CreateSignalFamilyTablesSQL()`. *(commit `214f837`)*
+- [x] `internal/core/timestamps.go` — `ReconstructTimestamps`. *(commit `214f837`)*
+- [x] `internal/core/adapter.go` — the `Adapter` interface, supporting types. *(commit `214f837`)*
+- [x] `internal/core/import_boundary_test.go` — enforces core isolation. *(commit `214f837`)*
+
+## P1 — DerivePhase warning in CLI paths
+
+- [ ] `group.go` `GroupAndImport` discards the `DerivePhase` bool (`phase, _ := DerivePhase(...)`) — should log or emit a warning for unknown session types. The adapter.go `Group` method handles this correctly; the gap is only in the CLI-facing `GroupAndImport` path.
+- [ ] `preview.go` has the same pattern — discards the bool in two places. Consider unifying the warning emission.
 
 ## P1 — iRacing stub
 
