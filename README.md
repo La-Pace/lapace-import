@@ -38,13 +38,23 @@ docs/
 ```bash
 go build ./...
 go test ./...
+mkdir -p bin
+go build -o bin/import-lmu ./cmd/import-lmu/
+go build -o bin/import-iracing ./cmd/import-iracing/
+```
+
+From the workspace root, the all-module native build also produces these
+binaries:
+
+```bash
+make build-native
 ```
 
 ## Quick start (LMU)
 
 ```bash
 # From the repo root:
-go run ./cmd/import-lmu --input=../sessions_data/sampledata/lmu_duckdb/practice_spa.duckdb --sessions-dir=../sessions
+go run ./cmd/import-lmu --input=../sampledata/lmu_duckdb/practice_spa.duckdb --sessions-dir=../sessions
 ```
 
 See [`docs/guides/lmu-import-guide.md`](docs/guides/lmu-import-guide.md) for the full guide.
