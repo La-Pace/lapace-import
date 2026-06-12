@@ -1,0 +1,21 @@
+# Binaries
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+*.test
+
+# Root-level Go build outputs
+/import-iracing
+/import-lmu
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
