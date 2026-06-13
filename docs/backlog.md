@@ -1,6 +1,6 @@
 # Backlog — `lapace-import`
 
-**Last updated:** 2026-06-11
+**Last updated:** 2026-06-13
 
 ## P0 — bootstrap the repo
 
@@ -29,9 +29,9 @@
 
 ## P1 — iRacing stub
 
-- [ ] `internal/iracing/adapter.go` — stub implementing `core.Adapter`. `Preview` returns a hardcoded "not yet implemented" `PreviewIssue`. `Convert` and `Group` return `errors.New("not yet implemented")`.
-- [ ] `cmd/import-iracing/main.go` — thin CLI matching `cmd/import-lmu/main.go`'s flag shape. Prints the "not yet implemented" message and exits non-zero.
-- [ ] Decide: should the iRacing stub be removed from the first cut and added only when iRacing work starts? Argument for keeping it: makes the boundary test enforce "every adapter is sibling-isolated" from day one. Argument for removing: a stub that does nothing is a maintenance tax. **Decision needed from maintainer.**
+- [x] `internal/iracing/adapter.go` — stub implementing `core.Adapter`. All three methods (`Preview`, `Convert`, `Group`) return `errors.New("iRacing adapter not yet implemented")`.
+- [x] `cmd/import-iracing/main.go` — thin CLI. Prints `import-iracing: not yet implemented` and exits non-zero.
+- [x] **Decision: keep the stub.** It makes the boundary test enforce adapter sibling-isolation from day one; the maintenance tax is negligible. Revisit only if it rots before the iRacing port lands.
 
 ## P1 — lapace-control integration (separate slice, but tracked here for context)
 

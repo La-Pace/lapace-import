@@ -1,45 +1,55 @@
 # Status — `lapace-import`
 
-**Repo status:** Planned
-**Last updated:** 2026-06-11
+**Repo status:** Complete (first cut)
+**Last updated:** 2026-06-13
 
 ## Current state
 
-The `lapace-import` repo does not yet exist as a directory in the workspace. The directory tree at `lapace-import/` is staging for the new repo. Code will be bootstrapped from the legacy `LaPace/internal/importlmu/` and `LaPace/cmd/import-lmu/` (which is frozen per ADR-23).
+`lapace-import` exists at `github.com/La-Pace/lapace-import`, builds clean, and
+passes its tests. The first cut — LMU offline import into signal-family
+SessionStint DBs — is shipped and pushed to `origin/main` (in sync). It is the
+Phase 1.5 module in the
+[module map](https://github.com/La-Pace/lapace-docs/blob/main/module-map/overview.md).
 
 ## What's done
 
-- Architecture decided: unified importer repo with per-sim adapter packages (ADR-0001).
-- Boundary contract drafted: `docs/technical/adapter-contract.md` codifies what lives in `internal/core` vs each adapter, the `core.Adapter` interface, and the test strategy.
-- User guide migrated: `docs/guides/lmu-import-guide.md` is the port of the legacy `lmu-import-guide.md`, updated for the new repo path and the C2 split.
-- Workspace-level pointers staged: `lapace-docs/CONTEXT.md` pipeline diagram will include the offline import path; `lapace-docs/module-map/overview.md` will list `lapace-import` as a phase-1.5 module.
+- Repo scaffolded with the ADR-0001 layout, `lapace-core` as the only Go dep,
+  and the workspace's standard `AGENTS.md` / `CLAUDE.md`.
+- LMU adapter ported from legacy `LaPace/internal/importlmu/` to `internal/lmu/`
+  — reader, mapping, converter, group, preview, setup-adapter, writer — plus CLI
+  (`cmd/import-lmu/`) and `testdata/`. Import paths retargeted to
+  `github.com/La-Pace/lapace-core/contract/...`.
+- Shared core extracted to `internal/core/`: generalized `core.Writer`,
+  `ReconstructTimestamps`, the `core.Adapter` interface, and the boundary
+  isolation test (`import_boundary_test.go`).
+- iRacing stub landed: `internal/iracing/adapter.go` implements `core.Adapter`
+  (all three methods return "iRacing adapter not yet implemented") and
+  `cmd/import-iracing/` prints the message and exits non-zero. Kept — so the
+  boundary test enforces adapter sibling-isolation from day one.
+- `go build ./...` and `go test ./...` pass (`internal/core`, `internal/lmu`).
+- Pushed and in sync: `main` == `origin/main` (0 ahead / 0 behind).
 
 ## What's in progress
 
-Nothing yet — this is the planning slice. No code has been ported.
+Nothing active. Remaining work is queued in [`backlog.md`](backlog.md) — P1
+(DerivePhase warning, `lapace-control` JSON-output flags), P2 (test-coverage
+hardening, including the golden-output test), P3 (docs polish).
 
 ## What's blocked
 
-- **Code bootstrap depends on `lapace-core` being consumable from a fresh repo.** It is, per the existing module map.
-- **`lapace-control` integration depends on a structured-output CLI flag** (likely `--json-preview` and a JSON emit mode for `Group` / `Convert`). The importer side is a follow-up CLI change in this repo; the consumer side is a follow-up change in `lapace-control`.
+- `lapace-control` subprocess integration depends on the `--json-preview` /
+  `--json-result` CLI flags (P1 in `backlog.md`). Both sides of that change are
+  separate slices.
 
 ## Done-enough criteria
 
-For the first cut of `lapace-import`, "done enough" means:
+Met — the first-cut criteria from the original plan are satisfied: repo layout,
+LMU port + test port, core extraction, iRacing stub, test suite green, docs
+accurate.
 
-1. Repo exists at `github.com/La-Pace/lapace-import` with the layout in ADR-0001.
-2. `internal/lmu/` is a port of legacy `internal/importlmu/`, with `ReconstructTimestamps` extracted to `internal/core/`.
-3. `internal/core/` contains the writer, the math, and the `core.Adapter` interface.
-4. `cmd/import-lmu/main.go` is a thin CLI that wires `lmu.Adapter` to the legacy flags.
-5. All existing LMU tests pass (`reader_test.go`, `mapping_test.go`, `converter_test.go`, `group_test.go`, `writer_test.go`, `preview_test.go`, `setup_adapter_test.go`, `import_test.go`, `integration_test.go`, `benchmark_test.go`).
-6. The four-layer test strategy is in place: boundary import test, schema validation test, golden output test, per-adapter coverage tests.
-7. `internal/iracing/` exists as a stub package that implements `core.Adapter` (possibly with `Preview` only; `Group` and `Convert` can be `panic("not yet implemented")` for the stub).
-8. `cmd/import-iracing/main.go` exists and prints a clear "not yet implemented" message.
-9. `docs/guides/lmu-import-guide.md` and `docs/technical/adapter-contract.md` are accurate against the ported code.
+## Out of scope (still)
 
-## Out of scope (for this slice)
-
-- iRacing adapter implementation. Stub only.
-- Structured-output CLI flags (JSON preview, JSON emit). Required for `lapace-control` integration but a separate slice.
-- New signal-family tables or columns. Adapter contract is closed at the current schema.
-- Multi-driver files, directory-based recordings, partial session groupings. Listed as open questions in `adapter-contract.md`; deferred until a sim forces them.
+- iRacing adapter implementation (stub only).
+- Structured-output CLI flags for `lapace-control` integration.
+- New signal-family tables/columns.
+- Multi-driver files, directory-based recordings, partial session groupings.
